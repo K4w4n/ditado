@@ -509,28 +509,6 @@ export default function App() {
                   </p>
                 )}
 
-                <form className="answer-form" onSubmit={handleSubmit}>
-                  <label htmlFor="answer">Digite a frase que você ouviu</label>
-                  <div className={`input-row${shake ? ' shake' : ''}`}>
-                    <input
-                      ref={inputRef}
-                      id="answer"
-                      type="text"
-                      value={typed}
-                      onChange={handleChange}
-                      placeholder="Escreva aqui…"
-                      autoComplete="off"
-                      autoCorrect="off"
-                      autoCapitalize="none"
-                      spellCheck={false}
-                      lang="pt-BR"
-                    />
-                    <button type="submit" className="primary">
-                      Conferir
-                    </button>
-                  </div>
-                </form>
-
                 <div className="progress-block">
                   <div className="progress-head">
                     <span>Seu progresso</span>
@@ -607,6 +585,28 @@ export default function App() {
                     })}
                   </div>
                 </div>
+
+                <form className="answer-form" onSubmit={handleSubmit}>
+                  <label htmlFor="answer">Digite a frase que você ouviu</label>
+                  <div className={`input-row${shake ? ' shake' : ''}`}>
+                    <input
+                      ref={inputRef}
+                      id="answer"
+                      type="text"
+                      value={typed}
+                      onChange={handleChange}
+                      placeholder="Escreva aqui…"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="none"
+                      spellCheck={false}
+                      lang="pt-BR"
+                    />
+                    <button type="submit" className="primary">
+                      Conferir
+                    </button>
+                  </div>
+                </form>
 
                 <p className="tip">
                   Acentos e pontuação contam. Letras verdes estão certas;
