@@ -358,6 +358,25 @@ input:focus-visible {
   outline: none;
 }
 
+/* Campo de digitação apenas para leitores de tela e teclado físico.
+   A entrada visível é feita pelo teclado do site. */
+.input-row input.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  box-shadow: none;
+}
+
+.input-row-solo .primary {
+  flex: 1 1 auto;
+}
+
 .input-row.shake {
   animation: shake 0.42s ease;
 }
@@ -698,6 +717,107 @@ input:focus-visible {
   margin-top: 7px;
   color: #978f80;
   font-size: 11px;
+}
+
+/* Teclado ----------------------------------------------------------- */
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #f4f0e6;
+  user-select: none;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.key {
+  display: grid;
+  place-items: center;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 56px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid #d8d0bf;
+  border-bottom-width: 3px;
+  border-radius: 9px;
+  background: #fffdf8;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.1s ease, transform 0.08s ease;
+}
+
+.key:hover {
+  background: #fbf7ed;
+}
+
+.key:active {
+  transform: translateY(1px);
+  border-bottom-width: 1px;
+  background: #efe8d9;
+}
+
+.key.accent-key {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.key.layer-key {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.key.space {
+  flex: 3.5 1 0;
+  max-width: none;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.key.backspace {
+  flex: 1.3 1 0;
+  max-width: 64px;
+  font-size: 16px;
+}
+
+@media (max-width: 560px) {
+  .keyboard {
+    gap: 5px;
+    margin-right: -18px;
+    margin-left: -18px;
+    padding: 8px;
+    border-radius: 14px;
+  }
+
+  .keyboard-row {
+    gap: 4px;
+  }
+
+  .key {
+    height: 42px;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+
+  .key.layer-key,
+  .key.space {
+    font-size: 11px;
+  }
 }
 
 /* Rodapé ------------------------------------------------------------ */

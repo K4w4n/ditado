@@ -15,7 +15,10 @@ Abra o endereço mostrado no terminal (normalmente `http://localhost:5173`).
 ## Como funciona
 
 - A página sorteia uma frase e a lê em voz alta (Web Speech API, voz pt-BR).
-- Você digita a frase ouvida no campo de resposta.
+- Você digita a frase ouvida. No **celular**, o campo nativo fica oculto e é
+  usado o **teclado do próprio site** (com camadas para acentos, números e
+  símbolos), evitando as sugestões do teclado do aparelho. No **computador**, o
+  campo fica visível e o teclado físico funciona normalmente.
 - O feedback alinha o texto digitado com a frase (estilo diff): letras certas em
   **verde**, trocadas ou digitadas a mais em vermelho e caracteres faltantes com
   um marcador amarelo `▯`. Assim, esquecer uma letra não desloca o restante da
@@ -23,8 +26,8 @@ Abra o endereço mostrado no terminal (normalmente `http://localhost:5173`).
 - Acentos e pontuação contam.
 - Emojis são desconsiderados: não são exibidos, não são falados e não contam
   como acerto nem como erro.
-- Ao pressionar **Enter** / **Conferir**, as tentativas erradas viram um
-  histórico da frase atual, com destaque nos caracteres divergentes e nos que
+- Ao usar **Conferir** (ou Enter no teclado físico), as tentativas erradas viram
+  um histórico da frase atual, com destaque nos caracteres divergentes e nos que
   faltaram.
 - Cada frase sorteada é gravada no `localStorage` (`ditado:frases-usadas`) e não
   aparece de novo até você usar **Zerar usadas**.

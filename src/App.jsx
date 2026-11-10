@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { PHRASES } from './phrases'
 import { buildFeedback, canonText, stripEmojis } from './compare'
+import Keyboard from './Keyboard'
 
 const USED_KEY = 'ditado:frases-usadas'
 const RATE_KEY = 'ditado:velocidade'
@@ -243,7 +244,12 @@ export default function App() {
   const [finished, setFinished] = useState(false)
   const [done, setDone] = useState(false)
   const [shake, setShake] = useState(false)
+  const [isTouch] = useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false
+    return window.matchMedia('(pointer: coarse)').matches
+  })
   const inputRef = useRef(null)
+  const typedRef = useRef('')
   const shakeTimer = useRef(null)
   const { speak, speaking, rate, setRate, supported, hasPortugueseVoice } =
     useSpeech()
@@ -253,6 +259,7 @@ export default function App() {
       window.clearTimeout(shakeTimer.current)
       setShake(false)
       setTyped('')
+      typedRef.current = ''
       setAttempts([])
       setFinished(false)
 
@@ -306,10 +313,11 @@ export default function App() {
     setFinished(true)
   }
 
-  function handleChange(event) {
+  function applyTypedValue(rawValue) {
     // Emojis são desconsiderados no ditado: saem do campo e da comparação.
     // Colapsar espaços evita que remover um emoji deixe um espaço "extra".
-    const value = stripEmojis(event.target.value).replace(/\s{2,}/g, ' ')
+    const value = stripEmojis(rawValue).replace(/\s{2,}/g, ' ')
+    typedRef.current = value
     setTyped(value)
     if (
       current &&
@@ -319,6 +327,30 @@ export default function App() {
     ) {
       finish()
     }
+  }
+
+  function handleChange(event) {
+    applyTypedValue(event.target.value)
+  }
+
+  function handleVirtualKey(key) {
+    const value = typedRef.current
+    if (key === 'backspace') {
+      applyTypedValue(value.slice(0, -1))
+    } else if (key === 'space') {
+      applyTypedValue(`${value} `)
+    } else {
+      applyTypedValue(`${value}${key}`)
+    }
+
+    // Mantém o campo focado para quem também usa teclado físico.
+    window.requestAnimationFrame(() => {
+      const input = inputRef.current
+      if (!input) return
+      input.focus()
+      const end = input.value.length
+      input.setSelectionRange(end, end)
+    })
   }
 
   function handleSubmit(event) {
@@ -592,10 +624,15 @@ export default function App() {
                   autoComplete="off"
                 >
                   <label htmlFor="answer">Digite a frase que você ouviu</label>
-                  <div className={`input-row${shake ? ' shake' : ''}`}>
+                  <div
+                    className={`input-row${isTouch ? ' input-row-solo' : ''}${
+                      shake ? ' shake' : ''
+                    }`}
+                  >
                     <input
                       ref={inputRef}
                       id="answer"
+                      className={isTouch ? 'sr-only' : undefined}
                       name="resposta-ditado"
                       type="text"
                       value={typed}
@@ -605,8 +642,9 @@ export default function App() {
                       autoCorrect="off"
                       autoCapitalize="none"
                       spellCheck={false}
-                      inputMode="text"
+                      inputMode={isTouch ? 'none' : 'text'}
                       enterKeyHint="done"
+                      readOnly={isTouch}
                       data-form-type="other"
                       data-lpignore="true"
                       data-1p-ignore="true"
@@ -618,8 +656,18 @@ export default function App() {
                   </div>
                 </form>
 
+                {isTouch && (
+                  <Keyboard
+                    onKey={handleVirtualKey}
+                    resetSignal={current.n}
+                  />
+                )}
+
                 <p className="tip">
-                  Acentos e pontuação contam. Letras verdes estão certas;
+                  {isTouch
+                    ? 'Use o teclado na tela.'
+                    : 'Use o teclado do computador.'}{' '}
+                  Acentos e pontuação contam; letras verdes estão certas;
                   <span className="tip-missing"> ▯ </span>
                   indica um caractere que faltou; vermelho indica troca ou
                   caractere a mais.
@@ -640,8 +688,7 @@ export default function App() {
               <div className="empty">
                 <strong>Nenhum erro registrado.</strong>
                 <span>
-                  Pressione <kbd>Enter</kbd> ou <em>Conferir</em> quando terminar
-                  de digitar.
+                  Use <em>Conferir</em> quando terminar de digitar.
                 </span>
               </div>
             ) : (
