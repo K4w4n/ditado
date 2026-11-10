@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { PHRASES } from './phrases'
-import { buildFeedback, canonText } from './compare'
+import { buildFeedback, canonText, stripEmojis } from './compare'
 
 const USED_KEY = 'ditado:frases-usadas'
 const RATE_KEY = 'ditado:velocidade'
@@ -153,6 +153,28 @@ function CheckIcon() {
   )
 }
 
+function TrophyIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="32"
+      height="32"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M8 21h8" />
+      <path d="M12 17v4" />
+      <path d="M7 4h10v5a5 5 0 0 1-10 0V4Z" />
+      <path d="M7 6H4v1a4 4 0 0 0 4 4" />
+      <path d="M17 6h3v1a4 4 0 0 1-4 4" />
+    </svg>
+  )
+}
+
 /* ------------------------------------------------------------------ */
 /* Histórico                                                           */
 /* ------------------------------------------------------------------ */
@@ -237,7 +259,9 @@ export default function App() {
         return
       }
 
-      const next = available[Math.floor(Math.random() * available.length)]
+      const drawn = available[Math.floor(Math.random() * available.length)]
+      const cleanedText = stripEmojis(drawn.text).replace(/\s+/g, ' ').trim()
+      const next = { ...drawn, text: cleanedText || drawn.text }
       const nextUsed = [...usedList, next.n]
 
       setCurrent(next)
@@ -278,7 +302,9 @@ export default function App() {
   }
 
   function handleChange(event) {
-    const value = event.target.value
+    // Emojis são desconsiderados no ditado: saem do campo e da comparação.
+    // Colapsar espaços evita que remover um emoji deixe um espaço "extra".
+    const value = stripEmojis(event.target.value).replace(/\s{2,}/g, ' ')
     setTyped(value)
     if (
       current &&
@@ -372,7 +398,7 @@ export default function App() {
             {done ? (
               <div className="result" role="status">
                 <div className="result-icon done" aria-hidden="true">
-                  🎉
+                  <TrophyIcon />
                 </div>
                 <h2>Você passou por todas as frases!</h2>
                 <p className="muted">

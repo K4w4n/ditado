@@ -21,6 +21,8 @@ Abra o endereço mostrado no terminal (normalmente `http://localhost:5173`).
   um marcador amarelo `▯`. Assim, esquecer uma letra não desloca o restante da
   frase.
 - Acentos e pontuação contam.
+- Emojis são desconsiderados: não são exibidos, não são falados e não contam
+  como acerto nem como erro.
 - Ao pressionar **Enter** / **Conferir**, as tentativas erradas viram um
   histórico da frase atual, com destaque nos caracteres divergentes e nos que
   faltaram.

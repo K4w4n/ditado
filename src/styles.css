@@ -532,9 +532,9 @@ input:focus-visible {
 }
 
 .result-icon.done {
-  font-size: 32px;
   background: #fbf0d8;
   border-color: #eddfbd;
+  color: #966310;
 }
 
 .reveal {

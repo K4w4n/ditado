@@ -25,14 +25,31 @@ const CHAR_EQUIVALENTS = {
   '\u00a0': ' ',
 }
 
-// Ignora diferenças de caixa, aspas "inteligentes" e espaços repetidos.
-// Acentos e pontuação continuam valendo, pois fazem parte do ditado.
+// Emojis e componentes de emojis (variações, tom de pele, ZWJ, bandeiras).
+// São ignorados no ditado: não contam como acerto/erro nem são falados.
+const EMOJI_PATTERN =
+  /[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\uFE0F\uFE0E\u200D\u20E3]+/gu
+const KEYCAP_PATTERN = /[0-9#*]\uFE0F?\u20E3/gu
+
+export function stripEmojis(text) {
+  return text
+    .replace(KEYCAP_PATTERN, '')
+    .replace(EMOJI_PATTERN, '')
+}
+
+// Ignora diferenças de caixa, aspas "inteligentes", emojis e espaços
+// repetidos. Acentos e pontuação continuam valendo, pois fazem parte do
+// ditado.
 export function canonChar(char) {
   return (CHAR_EQUIVALENTS[char] ?? char).toLocaleLowerCase('pt-BR')
 }
 
 export function canonText(text) {
-  return Array.from(text).map(canonChar).join('').trim().replace(/\s+/g, ' ')
+  return Array.from(stripEmojis(text))
+    .map(canonChar)
+    .join('')
+    .trim()
+    .replace(/\s+/g, ' ')
 }
 
 function sameChar(a, b) {
@@ -152,8 +169,8 @@ export function alignChars(target, typed) {
  * (`live: false`), tudo o que não foi digitado vira `missing`.
  */
 export function buildFeedback(target, typed, { live = true } = {}) {
-  const targetChars = Array.from(target)
-  const typedChars = Array.from(typed)
+  const targetChars = Array.from(stripEmojis(target))
+  const typedChars = Array.from(stripEmojis(typed))
 
   // Caso mais comum enquanto se digita: o texto é um prefixo exato da frase.
   const isExactPrefix =
