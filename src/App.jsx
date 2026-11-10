@@ -586,12 +586,17 @@ export default function App() {
                   </div>
                 </div>
 
-                <form className="answer-form" onSubmit={handleSubmit}>
+                <form
+                  className="answer-form"
+                  onSubmit={handleSubmit}
+                  autoComplete="off"
+                >
                   <label htmlFor="answer">Digite a frase que você ouviu</label>
                   <div className={`input-row${shake ? ' shake' : ''}`}>
                     <input
                       ref={inputRef}
                       id="answer"
+                      name="resposta-ditado"
                       type="text"
                       value={typed}
                       onChange={handleChange}
@@ -600,6 +605,11 @@ export default function App() {
                       autoCorrect="off"
                       autoCapitalize="none"
                       spellCheck={false}
+                      inputMode="text"
+                      enterKeyHint="done"
+                      data-form-type="other"
+                      data-lpignore="true"
+                      data-1p-ignore="true"
                       lang="pt-BR"
                     />
                     <button type="submit" className="primary">
