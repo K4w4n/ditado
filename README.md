@@ -28,6 +28,13 @@ Abra o endereço mostrado no terminal (normalmente `http://localhost:5173`).
   aparece de novo até você usar **Zerar usadas**.
 - A velocidade da voz também fica salva no `localStorage`.
 
+## Publicação
+
+Site publicado em **https://k4w4n.github.io/ditado/**.
+
+O deploy é automático pelo GitHub Actions (`.github/workflows/deploy.yml`): a
+cada push na branch `main`, o site é construído e publicado no GitHub Pages.
+
 ## Dados
 
 As 340 frases foram extraídas da aba **Frases** da planilha e ficam em
