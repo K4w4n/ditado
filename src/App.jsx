@@ -55,6 +55,9 @@ function useSpeech() {
   const [hasPortugueseVoice, setHasPortugueseVoice] = useState(true)
   const voiceRef = useRef(null)
   const rateRef = useRef(rate)
+  const speakId = useRef(0)
+  const activeRef = useRef(false)
+  const speechTimer = useRef(null)
 
   useEffect(() => {
     rateRef.current = rate
@@ -87,22 +90,56 @@ function useSpeech() {
     (text) => {
       if (!supported) return
       const synth = window.speechSynthesis
-      synth.cancel()
 
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = 'pt-BR'
-      utterance.rate = rateRef.current
-      if (voiceRef.current) utterance.voice = voiceRef.current
-      utterance.onstart = () => setSpeaking(true)
-      utterance.onend = () => setSpeaking(false)
-      utterance.onerror = () => setSpeaking(false)
-      synth.speak(utterance)
+      const id = speakId.current + 1
+      speakId.current = id
+      window.clearTimeout(speechTimer.current)
+      setSpeaking(false)
+
+      const start = () => {
+        if (id !== speakId.current) return
+
+        activeRef.current = true
+        const utterance = new SpeechSynthesisUtterance(text)
+        utterance.lang = 'pt-BR'
+        utterance.rate = rateRef.current
+        if (voiceRef.current) utterance.voice = voiceRef.current
+        utterance.onstart = () => {
+          if (id === speakId.current) setSpeaking(true)
+        }
+        utterance.onend = () => {
+          if (id !== speakId.current) return
+          activeRef.current = false
+          setSpeaking(false)
+        }
+        utterance.onerror = () => {
+          if (id !== speakId.current) return
+          activeRef.current = false
+          setSpeaking(false)
+        }
+
+        // No Chrome a síntese pode ficar pausada após um cancel().
+        if (synth.paused) synth.resume()
+        synth.speak(utterance)
+      }
+
+      if (activeRef.current || synth.speaking || synth.pending) {
+        // cancel() é assíncrono no Chrome: falar imediatamente depois dele
+        // corta o início da nova frase. Damos um pequeno intervalo antes de
+        // iniciar a próxima fala.
+        activeRef.current = false
+        synth.cancel()
+        speechTimer.current = window.setTimeout(start, 200)
+      } else {
+        start()
+      }
     },
     [supported],
   )
 
   useEffect(
     () => () => {
+      window.clearTimeout(speechTimer.current)
       if (supported) window.speechSynthesis.cancel()
     },
     [supported],
